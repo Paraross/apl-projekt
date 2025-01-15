@@ -9,10 +9,9 @@
             <Label Name="CoeffPolyLabel" Content="TODO" Height="30" VerticalContentAlignment="Center"/>
         </StackPanel>
         <Button Content="Calculate" Click="Calculate_Button_Click" Margin="10,10" Height="30" HorizontalAlignment="Left"/>
-        
         <StackPanel Margin="0,10" HorizontalAlignment="Left" Orientation="Horizontal">
             <Label Content="Scale:" Height="30" VerticalContentAlignment="Center"/>
-            <TextBox Text="Scale here" Width="64" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+            <TextBox Name="ScaleText" Text="1" Width="64" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
             <Label Content="Roots:"/>
@@ -29,6 +28,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <TextBox Name="SumText" Text="Sum here"/>
     </StackPanel>
 </Window>
