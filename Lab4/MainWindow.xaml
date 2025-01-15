@@ -1,12 +1,28 @@
 ﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="WpfUI.MainWindow" Title="MainWindow" Height="350" Width="525">
     <StackPanel>
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+            <Label Content="Roots poly: " Height="30" VerticalContentAlignment="Center"/>
+            <Label Name="RootsPolyLabel" Content="TODO" Height="30" VerticalContentAlignment="Center"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+            <Label Content="Coeff poly: " Height="30" VerticalContentAlignment="Center"/>
+            <Label Name="CoeffPolyLabel" Content="TODO" Height="30" VerticalContentAlignment="Center"/>
+        </StackPanel>
         <Button Content="Calculate" Click="Calculate_Button_Click" Margin="10,10" Height="30" HorizontalAlignment="Left"/>
-        <Button Content="New root" Click="New_Root_Button_Click" Margin="10,0" Height="30" HorizontalAlignment="Left"/>
-        <Label Content="Roots:"/>
-        <ItemsControl Name="lstRoots">
+        
+        <StackPanel Margin="0,10" HorizontalAlignment="Left" Orientation="Horizontal">
+            <Label Content="Scale:" Height="30" VerticalContentAlignment="Center"/>
+            <TextBox Text="Scale here" Width="64" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+            <Label Content="Roots:"/>
+            <Button Content="+" Click="New_Root_Button_Click" VerticalAlignment="Center" Width="15"/>
+            <Button Content="-" Click="Pop_Root_Button_Click" VerticalAlignment="Center" Width="15" Margin="10,0"/>
+        </StackPanel>
+        <ItemsControl Name="UIRoots">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Grid.ColumnSpan="2" Height="30">
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Grid.ColumnSpan="2">
                         <Label Content="Root:" VerticalAlignment="Center"/>
                         <TextBox Text="{Binding Value}" Width="64" Height="30" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
                     </StackPanel>

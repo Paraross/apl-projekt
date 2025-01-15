@@ -33,7 +33,7 @@ namespace WpfUI
         {
             InitializeComponent();
 
-            lstRoots.ItemsSource = Roots = [];
+            UIRoots.ItemsSource = Roots = [];
         }
 
         private void New_Root_Button_Click(object sender, RoutedEventArgs e)
@@ -52,6 +52,11 @@ namespace WpfUI
             }
 
             SumText.Text = sum.ToString();
+        }
+
+        private void Pop_Root_Button_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO:
         }
     }
 
