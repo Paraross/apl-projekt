@@ -8,7 +8,14 @@
             <Label Content="Coeff poly: " Height="30" VerticalContentAlignment="Center"/>
             <Label Name="CoeffPolyLabel" Content="" Height="30" VerticalContentAlignment="Center"/>
         </StackPanel>
-        <Button Content="Calculate" Click="Calculate_Button_Click" Margin="10,10" Height="30" HorizontalAlignment="Left"/>
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+            <Label Content="Time taken: " Height="30" VerticalContentAlignment="Center"/>
+            <Label Name="TimeTakenLabel" Content="" Height="30" VerticalContentAlignment="Center"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+            <Button Content="Calculate C#" Click="Calculate_Button_Click" Margin="10,10" Height="30" HorizontalAlignment="Left"/>
+            <Button Content="Calculate Asm" Height="30" HorizontalAlignment="Left"/>
+        </StackPanel>
         <StackPanel Margin="0,10" HorizontalAlignment="Left" Orientation="Horizontal">
             <Label Content="Scale:" Height="30" VerticalContentAlignment="Center"/>
             <TextBox Name="ScaleText" Text="1" Width="64" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>

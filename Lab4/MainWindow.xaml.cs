@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using static System.Net.Mime.MediaTypeNames;
 using System.Collections.ObjectModel;
 using System.Collections;
+using System.Diagnostics;
 
 namespace WpfUI
 {
@@ -47,14 +48,18 @@ namespace WpfUI
         {
             var rootValues = Roots.Select(root => root.Value);
             var scale = float.Parse(ScaleText.Text);
-            
+
             var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
 
             RootsPolyLabel.Content = rootsPoly.ToString();
 
-            // TODO: measure time this takes
-            var coeffPoly = (PolyCoeffs)rootsPoly;
+            var stopwatch = Stopwatch.StartNew();
 
+            var coeffPoly = (PolyCoeffs)rootsPoly;
+            
+            stopwatch.Stop();
+            
+            TimeTakenLabel.Content = String.Format("{0}", stopwatch.Elapsed);
             CoeffPolyLabel.Content = coeffPoly.ToString();
         }
 
