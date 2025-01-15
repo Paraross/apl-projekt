@@ -15,7 +15,7 @@ using System.Collections;
 
 namespace WpfUI
 {
-    // NOTE: delete this and just use float
+    // delete this and just use float if possible
     public class Root
     {
         public float Value { get; set; }
@@ -46,11 +46,12 @@ namespace WpfUI
         private void Calculate_Button_Click(object sender, RoutedEventArgs e)
         {
             var rootValues = Roots.Select(root => root.Value);
+            
             var scale = float.Parse(ScaleText.Text);
             var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
             RootsPolyLabel.Content = rootsPoly.ToString();
 
-            var coeffPoly = new PolyCoeffs([1.0f, 2.5f, -3.1f]);
+            var coeffPoly = (PolyCoeffs)rootsPoly;
             CoeffPolyLabel.Content = coeffPoly.ToString();
         }
 
@@ -102,11 +103,60 @@ namespace WpfUI
             }
             return s;
         }
+
+        public static explicit operator PolyCoeffs(PolyRootsScale poly)
+        {
+            if (poly.roots.Length == 0)
+            {
+                return new PolyCoeffs([poly.scale]);
+            }
+
+            var resultCoeffs = new PolyCoeffs([]);
+
+            resultCoeffs.coeffs.Add(poly.roots[0]);
+            resultCoeffs.coeffs.Add(1.0f);
+
+            foreach (var root in poly.roots[1..])
+            {
+                // deep copy?
+                var resultCoeffsPrev = new PolyCoeffs(new List<float>(resultCoeffs.coeffs));
+                for (var i = 0; i < resultCoeffsPrev.coeffs.Count; i++)
+                {
+                    resultCoeffsPrev.coeffs[i] *= root;
+                }
+
+                resultCoeffs.increasePower();
+
+                for (var i = 0; i < resultCoeffsPrev.coeffs.Count; i++)
+                {
+                    resultCoeffs.coeffs[i] += resultCoeffsPrev.coeffs[i];
+                }
+            }
+
+            for (var i = 0; i < resultCoeffs.coeffs.Count; i++)
+            {
+                resultCoeffs.coeffs[i] *= poly.scale;
+                if (i % 2 == 0)
+                {
+                    resultCoeffs.coeffs[i] *= -1.0f;
+                }
+            }
+
+            if (resultCoeffs.degree() % 2 == 0)
+            {
+                for (var i = 0; i < resultCoeffs.coeffs.Count; i++)
+                {
+                    resultCoeffs.coeffs[i] *= -1.0f;
+                }
+            }
+
+            return resultCoeffs;
+        }
     }
 
-    class PolyCoeffs
+    public class PolyCoeffs
     {
-        private List<float> coeffs;
+        public List<float> coeffs; // Coeffs? check naming convention
 
         public PolyCoeffs(List<float> coeffs)
         {
@@ -120,7 +170,6 @@ namespace WpfUI
 
         public void increasePower()
         {
-            // not sure if this works
             coeffs.Add(0.0f);
             for (var i = coeffs.Count - 1; i >= 1; i--)
             {
