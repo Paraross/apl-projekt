@@ -46,12 +46,15 @@ namespace WpfUI
         private void Calculate_Button_Click(object sender, RoutedEventArgs e)
         {
             var rootValues = Roots.Select(root => root.Value);
-            
             var scale = float.Parse(ScaleText.Text);
+            
             var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
+
             RootsPolyLabel.Content = rootsPoly.ToString();
 
+            // TODO: measure time this takes
             var coeffPoly = (PolyCoeffs)rootsPoly;
+
             CoeffPolyLabel.Content = coeffPoly.ToString();
         }
 
