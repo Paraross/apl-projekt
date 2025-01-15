@@ -18,6 +18,11 @@ namespace WpfUI
     public class Root
     {
         public float Value { get; set; }
+
+        public Root(float value)
+        {
+            Value = value;
+        }
     }
 
     public partial class MainWindow : Window
@@ -28,13 +33,25 @@ namespace WpfUI
         {
             InitializeComponent();
 
-            //Roots = new ObservableCollection<Root>();
-            Roots = [];
+            lstRoots.ItemsSource = Roots = [];
         }
 
-        private void New_Text_Field_Button_Click(object sender, RoutedEventArgs e)
+        private void New_Root_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            var root = new Root(0.0f);
+            Roots.Add(root);
+        }
+
+        private void Calculate_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var sum = 0.0f;
+
+            foreach (Root root1 in Roots)
+            {
+                sum += root1.Value;
+            }
+
+            SumText.Text = sum.ToString();
         }
     }
 
