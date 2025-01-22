@@ -56,9 +56,57 @@ namespace WpfUI
             var stopwatch = Stopwatch.StartNew();
 
             var coeffPoly = (PolyCoeffs)rootsPoly;
-            
+
             stopwatch.Stop();
-            
+
+            TimeTakenLabel.Content = String.Format("{0}", stopwatch.Elapsed);
+            CoeffPolyLabel.Content = coeffPoly.ToString();
+        }
+
+        public void Calculate_Asm_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var rootValues = Roots.Select(root => root.Value);
+            var scale = float.Parse(ScaleText.Text);
+
+            var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
+
+            RootsPolyLabel.Content = rootsPoly.ToString();
+
+            var len = rootsPoly.roots.Length;
+
+            var stopwatch = Stopwatch.StartNew();
+
+            // allocate space for resultCoeffsPrev and resultCoeffs
+            var resultCoeffsPrev = new List<float>(len);
+            for (var i = 0; i < resultCoeffsPrev.Count; i++)
+            {
+                resultCoeffsPrev.Add(0.0f);
+            }
+            var resultCoeffs = new List<float>(len);
+            for (var i = 0; i < resultCoeffs.Count; i++)
+            {
+                resultCoeffs.Add(0.0f);
+            }
+
+            float[] resultCoeffsPrevArr = [.. resultCoeffsPrev];
+            float[] resultCoeffsArr = [.. resultCoeffs];
+            unsafe
+            {
+                fixed (
+                    float* rootsPtr = rootsPoly.roots,
+                    prevArrPtr = resultCoeffsPrevArr,
+                    arrPtr = resultCoeffsArr
+                )
+                {
+
+                    AsmProxy.ExecuteConvertRaw(rootsPtr, scale, (long)len, prevArrPtr, arrPtr);
+                }
+            }
+
+            stopwatch.Stop();
+
+            var coeffPoly = new PolyCoeffs(resultCoeffs);
+
             TimeTakenLabel.Content = String.Format("{0}", stopwatch.Elapsed);
             CoeffPolyLabel.Content = coeffPoly.ToString();
         }
@@ -71,18 +119,36 @@ namespace WpfUI
 
     public unsafe class AsmProxy
     {
-        [DllImport("Asm.dll")]
-        private static extern double AsmAddTwoDoubles(double a, double b);
+        [DllImport("Asm.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern double convertRaw(
+            float* roots,
+            float scale,
+            long len,
+            float* resultCoeffsPrev,
+            float* resultCoeffs
+        );
 
-        public static double ExecuteAsmAddTwoDoubles(double a, double b)
+        public static double ExecuteConvertRaw(
+            float* roots,
+            float scale,
+            long len,
+            float* resultCoeffsPrev,
+            float* resultCoeffs
+        )
         {
-            return AsmAddTwoDoubles(a, b);
+            return convertRaw(
+                roots,
+                scale,
+                len,
+                resultCoeffsPrev,
+                resultCoeffs
+            );
         }
     }
 
     public class PolyRootsScale
     {
-        private float[] roots;
+        public float[] roots;
         private float scale;
 
         public PolyRootsScale(float[] roots, float scale)

@@ -10,7 +10,7 @@ result_coeffs$ = 48
 
 .code
 
-convert_raw PROC                                        ; COMDAT
+convertRaw PROC                                        ; COMDAT
 $LN58:
         mov     rax, rsp
         mov     QWORD PTR [rax+8], rbx
@@ -20,7 +20,7 @@ $LN58:
         push    r14
         mov     r11, QWORD PTR result_coeffs$[rsp]
         xor     edx, edx
-        mov     eax, DWORD PTR [rcx]
+        mov     eax, DWORD PTR [rcx] ; chuj
         mov     rsi, r9
         mov     rbp, r8
         movaps  xmm2, xmm1
@@ -117,6 +117,6 @@ $LN18@convert_ra:
         mov     rdi, QWORD PTR [rsp+40]
         pop     r14
         ret     0
-convert_raw ENDP
+convertRaw ENDP
 
 END
