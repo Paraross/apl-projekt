@@ -78,12 +78,12 @@ namespace WpfUI
 
             // allocate space for resultCoeffsPrev and resultCoeffs
             var resultCoeffsPrev = new List<float>(len);
-            for (var i = 0; i < resultCoeffsPrev.Count; i++)
+            for (var i = 0; i < resultCoeffsPrev.Capacity; i++)
             {
                 resultCoeffsPrev.Add(0.0f);
             }
-            var resultCoeffs = new List<float>(len);
-            for (var i = 0; i < resultCoeffs.Count; i++)
+            var resultCoeffs = new List<float>(len + 1);
+            for (var i = 0; i < resultCoeffs.Capacity; i++)
             {
                 resultCoeffs.Add(0.0f);
             }
@@ -105,7 +105,7 @@ namespace WpfUI
 
             stopwatch.Stop();
 
-            var coeffPoly = new PolyCoeffs(resultCoeffs);
+            var coeffPoly = new PolyCoeffs(resultCoeffsArr.ToList());
 
             TimeTakenLabel.Content = String.Format("{0}", stopwatch.Elapsed);
             CoeffPolyLabel.Content = coeffPoly.ToString();
@@ -119,7 +119,7 @@ namespace WpfUI
 
     public unsafe class AsmProxy
     {
-        [DllImport("Asm.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Asm.dll")]
         private static extern double convertRaw(
             float* roots,
             float scale,
