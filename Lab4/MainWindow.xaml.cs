@@ -6,14 +6,9 @@ using System.Diagnostics;
 namespace WpfUI
 {
     // delete this and just use float if possible
-    public class Root
+    public class Root(float value)
     {
-        public float Value { get; set; }
-
-        public Root(float value)
-        {
-            Value = value;
-        }
+        public float Value { get; set; } = value;
     }
 
     public partial class MainWindow : Window
@@ -24,7 +19,8 @@ namespace WpfUI
         {
             InitializeComponent();
 
-            UIRoots.ItemsSource = Roots = [];
+            Roots = [];
+            UIRoots.ItemsSource = Roots;
         }
 
         private void New_Root_Button_Click(object sender, RoutedEventArgs e)
@@ -94,9 +90,9 @@ namespace WpfUI
 
             stopwatch.Stop();
 
-            var coeffPoly = new PolyCoeffs(resultCoeffsArr.ToList());
+            var coeffPoly = new PolyCoeffs([.. resultCoeffsArr]);
 
-            TimeTakenLabel.Content = String.Format("{0}", stopwatch.Elapsed);
+            TimeTakenLabel.Content = stopwatch.Elapsed;
             CoeffPolyLabel.Content = coeffPoly.ToString();
         }
 
@@ -135,16 +131,10 @@ namespace WpfUI
         }
     }
 
-    public class PolyRootsScale
+    public class PolyRootsScale(float[] roots, float scale)
     {
-        public float[] roots;
-        private float scale;
-
-        public PolyRootsScale(float[] roots, float scale)
-        {
-            this.roots = roots;
-            this.scale = scale;
-        }
+        public float[] roots = roots;
+        private readonly float scale = scale;
 
         public override string ToString()
         {
@@ -188,7 +178,7 @@ namespace WpfUI
                     resultCoeffsPrev.coeffs[i] *= root;
                 }
 
-                resultCoeffs.increasePower();
+                resultCoeffs.IncreasePower();
 
                 for (var i = 0; i < resultCoeffsPrev.coeffs.Count; i++)
                 {
@@ -205,7 +195,7 @@ namespace WpfUI
                 }
             }
 
-            if (resultCoeffs.degree() % 2 == 0)
+            if (resultCoeffs.Degree() % 2 == 0)
             {
                 for (var i = 0; i < resultCoeffs.coeffs.Count; i++)
                 {
@@ -217,21 +207,16 @@ namespace WpfUI
         }
     }
 
-    public class PolyCoeffs
+    public class PolyCoeffs(List<float> coeffs)
     {
-        public List<float> coeffs; // Coeffs? check naming convention
+        public List<float> coeffs = coeffs; // Coeffs? check naming convention
 
-        public PolyCoeffs(List<float> coeffs)
-        {
-            this.coeffs = coeffs;
-        }
-
-        public int degree()
+        public int Degree()
         {
             return coeffs.Count - 1;
         }
 
-        public void increasePower()
+        public void IncreasePower()
         {
             coeffs.Add(0.0f);
             for (var i = coeffs.Count - 1; i >= 1; i--)
@@ -258,7 +243,7 @@ namespace WpfUI
                     _ => "", // var x when (x < 1)
                 };
 
-                if (degree == this.degree())
+                if (degree == this.Degree())
                 {
                     s += coeff.ToString() + degreeStr;
                 }
