@@ -95,7 +95,7 @@ namespace WpfUI
         /// </summary>
         private void Pop_Root_Button_Click(object sender, RoutedEventArgs e)
         {
-            // TODO:
+            Roots.RemoveAt(Roots.Count - 1);
         }
 
         /// <summary>
