@@ -56,7 +56,7 @@ namespace WpfUI
 
             RootsPolyLabel.Content = rootsPoly.ToString();
 
-            var len = rootsPoly.roots.Length;
+            var len = rootsPoly.Roots.Length;
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -77,7 +77,7 @@ namespace WpfUI
             unsafe
             {
                 fixed (
-                    float* rootsPtr = rootsPoly.roots,
+                    float* rootsPtr = rootsPoly.Roots,
                     prevArrPtr = resultCoeffsPrevArr,
                     arrPtr = resultCoeffsArr
                 )
@@ -132,13 +132,13 @@ namespace WpfUI
 
     public class PolyRootsScale(float[] roots, float scale)
     {
-        public float[] roots = roots;
+        public float[] Roots = roots;
         private readonly float scale = scale;
 
         public override string ToString()
         {
             var s = scale.ToString();
-            foreach (var root in roots)
+            foreach (var root in Roots)
             {
                 if (root < 0.0f)
                 {
@@ -158,47 +158,47 @@ namespace WpfUI
 
         public static explicit operator PolyCoeffs(PolyRootsScale poly)
         {
-            if (poly.roots.Length == 0)
+            if (poly.Roots.Length == 0)
             {
                 return new PolyCoeffs([poly.scale]);
             }
 
             var resultCoeffs = new PolyCoeffs([]);
 
-            resultCoeffs.coeffs.Add(poly.roots[0]);
-            resultCoeffs.coeffs.Add(1.0f);
+            resultCoeffs.Coeffs.Add(poly.Roots[0]);
+            resultCoeffs.Coeffs.Add(1.0f);
 
-            foreach (var root in poly.roots[1..])
+            foreach (var root in poly.Roots[1..])
             {
                 // deep copy?
-                var resultCoeffsPrev = new PolyCoeffs(new List<float>(resultCoeffs.coeffs));
-                for (var i = 0; i < resultCoeffsPrev.coeffs.Count; i++)
+                var resultCoeffsPrev = new PolyCoeffs(new List<float>(resultCoeffs.Coeffs));
+                for (var i = 0; i < resultCoeffsPrev.Coeffs.Count; i++)
                 {
-                    resultCoeffsPrev.coeffs[i] *= root;
+                    resultCoeffsPrev.Coeffs[i] *= root;
                 }
 
                 resultCoeffs.IncreasePower();
 
-                for (var i = 0; i < resultCoeffsPrev.coeffs.Count; i++)
+                for (var i = 0; i < resultCoeffsPrev.Coeffs.Count; i++)
                 {
-                    resultCoeffs.coeffs[i] += resultCoeffsPrev.coeffs[i];
+                    resultCoeffs.Coeffs[i] += resultCoeffsPrev.Coeffs[i];
                 }
             }
 
-            for (var i = 0; i < resultCoeffs.coeffs.Count; i++)
+            for (var i = 0; i < resultCoeffs.Coeffs.Count; i++)
             {
-                resultCoeffs.coeffs[i] *= poly.scale;
+                resultCoeffs.Coeffs[i] *= poly.scale;
                 if (i % 2 == 0)
                 {
-                    resultCoeffs.coeffs[i] *= -1.0f;
+                    resultCoeffs.Coeffs[i] *= -1.0f;
                 }
             }
 
             if (resultCoeffs.Degree() % 2 == 0)
             {
-                for (var i = 0; i < resultCoeffs.coeffs.Count; i++)
+                for (var i = 0; i < resultCoeffs.Coeffs.Count; i++)
                 {
-                    resultCoeffs.coeffs[i] *= -1.0f;
+                    resultCoeffs.Coeffs[i] *= -1.0f;
                 }
             }
 
@@ -208,21 +208,21 @@ namespace WpfUI
 
     public class PolyCoeffs(List<float> coeffs)
     {
-        public List<float> coeffs = coeffs; // Coeffs? check naming convention
+        public List<float> Coeffs = coeffs;
 
         public int Degree()
         {
-            return coeffs.Count - 1;
+            return Coeffs.Count - 1;
         }
 
         public void IncreasePower()
         {
-            coeffs.Add(0.0f);
-            for (var i = coeffs.Count - 1; i >= 1; i--)
+            Coeffs.Add(0.0f);
+            for (var i = Coeffs.Count - 1; i >= 1; i--)
             {
-                coeffs[i] = coeffs[i - 1];
+                Coeffs[i] = Coeffs[i - 1];
             }
-            coeffs[0] = 0.0f;
+            Coeffs[0] = 0.0f;
         }
 
         public override string ToString()
@@ -230,7 +230,7 @@ namespace WpfUI
             var s = "";
 
             // iterates over index, value pairs in reverse order
-            foreach (var it in coeffs.Select((x, i) => new { Value = x, Index = i }).Reverse())
+            foreach (var it in Coeffs.Select((x, i) => new { Value = x, Index = i }).Reverse())
             {
                 var degree = it.Index;
                 var coeff = it.Value;
