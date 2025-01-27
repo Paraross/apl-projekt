@@ -23,7 +23,7 @@
         </StackPanel>
         <StackPanel Margin="0,10" HorizontalAlignment="Left" Orientation="Horizontal">
             <Label Content="Scale:" Height="30" VerticalContentAlignment="Center"/>
-            <xctk:SingleUpDown Name="ScaleUpDown" FormatString="F2" Value="1.0" Increment="1.0" Width="64"/>
+            <xctk:SingleUpDown Name="ScaleUpDown" FormatString="F2" Value="1.0" DefaultValue="0.0" Increment="1.0" Width="64"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
             <Label Content="Roots:"/>
@@ -35,7 +35,7 @@
                 <DataTemplate>
                     <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Grid.ColumnSpan="2">
                         <Label Content="Root:" VerticalAlignment="Center"/>
-                        <xctk:SingleUpDown FormatString="F2" Value="{Binding Value}" Increment="1.0" Width="64"/>
+                        <xctk:SingleUpDown FormatString="F2" Value="{Binding Value}" DefaultValue="0.0" Increment="1.0" Width="64"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
