@@ -5,6 +5,10 @@ using System.Windows;
 
 namespace WpfUI
 {
+    /// <summary>
+    /// References a root in the UI.
+    /// </summary>
+    /// <param name="value">The value of the root.</param>
     public class Root(float value)
     {
         public float Value { get; set; } = value;
@@ -12,6 +16,9 @@ namespace WpfUI
 
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// References the roots in the UI.
+        /// </summary>
         public ObservableCollection<Root> Roots { get; set; }
 
         public MainWindow()
@@ -22,12 +29,19 @@ namespace WpfUI
             UIRoots.ItemsSource = Roots;
         }
 
+        /// <summary>
+        /// Adds a new root when button is pressed.
+        /// </summary>
         private void New_Root_Button_Click(object sender, RoutedEventArgs e)
         {
             var root = new Root(0.0f);
             Roots.Add(root);
         }
 
+        /// <summary>
+        /// Performs calculations when button is pressed.
+        /// C# version.
+        /// </summary>
         private void Calculate_Button_Click(object sender, RoutedEventArgs e)
         {
             var rootsPoly = GetPolyFromInputAndSetLabel();
@@ -41,6 +55,10 @@ namespace WpfUI
             SetLabelContents(stopwatch, coeffPoly);
         }
 
+        /// <summary>
+        /// Performs calculations when button is pressed.
+        /// Assembly version.
+        /// </summary>
         private void Calculate_Asm_Button_Click(object sender, RoutedEventArgs e)
         {
             var rootsPoly = GetPolyFromInputAndSetLabel();
@@ -72,11 +90,20 @@ namespace WpfUI
             SetLabelContents(stopwatch, coeffPoly);
         }
 
+        /// <summary>
+        /// Removes the last root when button is pressed.
+        /// </summary>
         private void Pop_Root_Button_Click(object sender, RoutedEventArgs e)
         {
             // TODO:
         }
 
+        /// <summary>
+        /// Parses the values from the UI and creates a <c>PolyRootsScale</c> from them.
+        /// </summary>
+        /// <returns>
+        /// A <c>PolyRootsScale</c> represented by the values from the UI.
+        /// </returns>
         private PolyRootsScale GetPolyFromInputAndSetLabel()
         {
             var rootValues = Roots.Select(root => root.Value);
@@ -88,6 +115,11 @@ namespace WpfUI
             return rootsPoly;
         }
 
+        /// <summary>
+        /// Sets the time taken and coeff poly labels.
+        /// </summary>
+        /// <param name="stopwatch"><c>Stopwatch</c> for the time taken label.</param>
+        /// <param name="coeffPoly"><c>PolyCoeffs </c>for the coeff poly label.</param>
         private void SetLabelContents(Stopwatch stopwatch, PolyCoeffs coeffPoly)
         {
             TimeTakenLabel.Content = stopwatch.Elapsed;
@@ -95,10 +127,21 @@ namespace WpfUI
         }
     }
 
+    /// <summary>
+    /// Class wrapping the assembly procedure.
+    /// </summary>
     public unsafe class AsmProxy
     {
+        /// <summary>
+        /// The assembly procedure.
+        /// </summary>
+        /// <param name="roots">Roots of the <c>PolyRootsScale</c>.</param>
+        /// <param name="scale">Scale of the <c>PolyRootsScale</c>.</param>
+        /// <param name="len">Number of roots of the <c>PolyRootsScale</c>.</param>
+        /// <param name="resultCoeffsPrev">Additional allocated space used by the procedure.</param>
+        /// <param name="resultCoeffs">Where the coefficients of the resulting <c>PolyCoeffs</c> will be written to.</param>
         [DllImport("Asm.dll")]
-        private static extern float convertRaw(
+        private static extern void convertRaw(
             float* roots,
             float scale,
             long len,
@@ -106,7 +149,15 @@ namespace WpfUI
             float* resultCoeffs
         );
 
-        public static float ExecuteConvertRaw(
+        /// <summary>
+        /// Function wrapping the assembly procedure.
+        /// </summary>
+        /// <param name="roots">Roots of the <c>PolyRootsScale</c>.</param>
+        /// <param name="scale">Scale of the <c>PolyRootsScale</c>.</param>
+        /// <param name="len">Number of roots of the <c>PolyRootsScale</c>.</param>
+        /// <param name="resultCoeffsPrev">Additional allocated space used by the procedure.</param>
+        /// <param name="resultCoeffs">Where the coefficients of the resulting <c>PolyCoeffs</c> will be written to.</param>
+        public static void ExecuteConvertRaw(
             float* roots,
             float scale,
             long len,
@@ -114,7 +165,7 @@ namespace WpfUI
             float* resultCoeffs
         )
         {
-            return convertRaw(
+            convertRaw(
                 roots,
                 scale,
                 len,
@@ -124,9 +175,20 @@ namespace WpfUI
         }
     }
 
+    /// <summary>
+    /// Polynomial in the roots form.
+    /// </summary>
+    /// <param name="roots">Roots of the polynomial.</param>
+    /// <param name="scale">Scale of the polynomial.</param>
     public class PolyRootsScale(float[] roots, float scale)
     {
+        /// <summary>
+        /// Roots of the polynomial.
+        /// </summary>
         public float[] Roots = roots;
+        /// <summary>
+        /// Scale of the polynomial.
+        /// </summary>
         public readonly float Scale = scale;
 
         public override string ToString()
@@ -200,12 +262,26 @@ namespace WpfUI
         }
     }
 
+    /// <summary>
+    /// Polynomial in the standard form.
+    /// </summary>
+    /// <param name="coeffs">Coefficients of the polynomial.</param>
     public class PolyCoeffs(List<float> coeffs)
     {
+        /// <summary>
+        /// Coefficients of the polynomial.
+        /// </summary>
         public List<float> Coeffs = coeffs;
 
+        /// <summary>
+        /// Degree of the polynomial.
+        /// </summary>
         public int Degree => Coeffs.Count - 1;
 
+        /// <summary>
+        /// Increases the power of each term by 1.
+        /// Equivalent to multiplying the whole polynomial by x.
+        /// </summary>
         public void IncreasePower()
         {
             Coeffs.Add(0.0f);
