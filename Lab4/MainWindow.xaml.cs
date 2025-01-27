@@ -1,7 +1,7 @@
-﻿using System.Windows;
-using System.Runtime.InteropServices;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace WpfUI
 {
