@@ -41,7 +41,7 @@ namespace WpfUI
             SetLabelContents(stopwatch, coeffPoly);
         }
 
-        public void Calculate_Asm_Button_Click(object sender, RoutedEventArgs e)
+        private void Calculate_Asm_Button_Click(object sender, RoutedEventArgs e)
         {
             var rootsPoly = GetPolyFromInputAndSetLabel();
 
