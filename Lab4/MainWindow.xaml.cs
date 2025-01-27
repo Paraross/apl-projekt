@@ -5,8 +5,7 @@ using System.Diagnostics;
 
 namespace WpfUI
 {
-    // delete this and just use float if possible
-    public class Root(float value)
+    public struct Root(float value)
     {
         public float Value { get; set; } = value;
     }
