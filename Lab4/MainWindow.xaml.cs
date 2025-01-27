@@ -30,12 +30,7 @@ namespace WpfUI
 
         private void Calculate_Button_Click(object sender, RoutedEventArgs e)
         {
-            var rootValues = Roots.Select(root => root.Value);
-            var scale = float.Parse(ScaleText.Text);
-
-            var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
-
-            RootsPolyLabel.Content = rootsPoly.ToString();
+            var rootsPoly = GetPolyFromInputAndSetLabel();
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -43,18 +38,12 @@ namespace WpfUI
 
             stopwatch.Stop();
 
-            TimeTakenLabel.Content = String.Format("{0}", stopwatch.Elapsed);
-            CoeffPolyLabel.Content = coeffPoly.ToString();
+            SetLabelContents(stopwatch, coeffPoly);
         }
 
         public void Calculate_Asm_Button_Click(object sender, RoutedEventArgs e)
         {
-            var rootValues = Roots.Select(root => root.Value);
-            var scale = float.Parse(ScaleText.Text);
-
-            var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
-
-            RootsPolyLabel.Content = rootsPoly.ToString();
+            var rootsPoly = GetPolyFromInputAndSetLabel();
 
             var len = rootsPoly.Roots.Length;
 
@@ -83,7 +72,7 @@ namespace WpfUI
                 )
                 {
 
-                    AsmProxy.ExecuteConvertRaw(rootsPtr, scale, (long)len, prevArrPtr, arrPtr);
+                    AsmProxy.ExecuteConvertRaw(rootsPtr, rootsPoly.Scale, (long)len, prevArrPtr, arrPtr);
                 }
             }
 
@@ -91,13 +80,29 @@ namespace WpfUI
 
             var coeffPoly = new PolyCoeffs([.. resultCoeffsArr]);
 
-            TimeTakenLabel.Content = stopwatch.Elapsed;
-            CoeffPolyLabel.Content = coeffPoly.ToString();
+            SetLabelContents(stopwatch, coeffPoly);
         }
 
         private void Pop_Root_Button_Click(object sender, RoutedEventArgs e)
         {
             // TODO:
+        }
+
+        private PolyRootsScale GetPolyFromInputAndSetLabel()
+        {
+            var rootValues = Roots.Select(root => root.Value);
+            var scale = float.Parse(ScaleText.Text);
+            var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
+
+            RootsPolyLabel.Content = rootsPoly.ToString();
+
+            return rootsPoly;
+        }
+
+        private void SetLabelContents(Stopwatch stopwatch, PolyCoeffs coeffPoly)
+        {
+            TimeTakenLabel.Content = stopwatch.Elapsed;
+            CoeffPolyLabel.Content = coeffPoly.ToString();
         }
     }
 
@@ -133,11 +138,11 @@ namespace WpfUI
     public class PolyRootsScale(float[] roots, float scale)
     {
         public float[] Roots = roots;
-        private readonly float scale = scale;
+        public readonly float Scale = scale;
 
         public override string ToString()
         {
-            var s = scale.ToString();
+            var s = Scale.ToString();
             foreach (var root in Roots)
             {
                 if (root < 0.0f)
@@ -160,7 +165,7 @@ namespace WpfUI
         {
             if (poly.Roots.Length == 0)
             {
-                return new PolyCoeffs([poly.scale]);
+                return new PolyCoeffs([poly.Scale]);
             }
 
             var resultCoeffs = new PolyCoeffs([]);
@@ -187,7 +192,7 @@ namespace WpfUI
 
             for (var i = 0; i < resultCoeffs.Coeffs.Count; i++)
             {
-                resultCoeffs.Coeffs[i] *= poly.scale;
+                resultCoeffs.Coeffs[i] *= poly.Scale;
                 if (i % 2 == 0)
                 {
                     resultCoeffs.Coeffs[i] *= -1.0f;
