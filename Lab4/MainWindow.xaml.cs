@@ -50,19 +50,9 @@ namespace WpfUI
             var stopwatch = Stopwatch.StartNew();
 
             // allocate space for resultCoeffsPrev and resultCoeffs
-            var resultCoeffsPrev = new List<float>(len);
-            for (var i = 0; i < resultCoeffsPrev.Capacity; i++)
-            {
-                resultCoeffsPrev.Add(0.0f);
-            }
-            var resultCoeffs = new List<float>(len + 1);
-            for (var i = 0; i < resultCoeffs.Capacity; i++)
-            {
-                resultCoeffs.Add(0.0f);
-            }
+            var resultCoeffsPrevArr = new float[len];
+            var resultCoeffsArr = new float[len + 1];
 
-            float[] resultCoeffsPrevArr = [.. resultCoeffsPrev];
-            float[] resultCoeffsArr = [.. resultCoeffs];
             unsafe
             {
                 fixed (
@@ -71,7 +61,6 @@ namespace WpfUI
                     arrPtr = resultCoeffsArr
                 )
                 {
-
                     AsmProxy.ExecuteConvertRaw(rootsPtr, rootsPoly.Scale, (long)len, prevArrPtr, arrPtr);
                 }
             }
