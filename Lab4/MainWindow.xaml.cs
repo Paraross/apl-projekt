@@ -98,7 +98,7 @@ namespace WpfUI
     public unsafe class AsmProxy
     {
         [DllImport("Asm.dll")]
-        private static extern double convertRaw(
+        private static extern float convertRaw(
             float* roots,
             float scale,
             long len,
@@ -106,7 +106,7 @@ namespace WpfUI
             float* resultCoeffs
         );
 
-        public static double ExecuteConvertRaw(
+        public static float ExecuteConvertRaw(
             float* roots,
             float scale,
             long len,
