@@ -110,7 +110,16 @@ namespace WpfUI
         private PolyRootsScale GetPolyFromInputAndSetLabel()
         {
             var rootValues = Roots.Select(root => root.Value);
-            var scale = float.Parse(ScaleText.Text);
+            float scale;
+            try
+            {
+                scale = float.Parse(ScaleText.Text);
+            }
+            catch (FormatException)
+            {
+                scale = 0.0f;
+            }
+
             var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
 
             RootsPolyLabel.Content = rootsPoly.ToString();
