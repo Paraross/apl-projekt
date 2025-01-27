@@ -188,7 +188,7 @@ namespace WpfUI
                 }
             }
 
-            if (resultCoeffs.Degree() % 2 == 0)
+            if (resultCoeffs.Degree % 2 == 0)
             {
                 for (var i = 0; i < resultCoeffs.Coeffs.Count; i++)
                 {
@@ -204,10 +204,7 @@ namespace WpfUI
     {
         public List<float> Coeffs = coeffs;
 
-        public int Degree()
-        {
-            return Coeffs.Count - 1;
-        }
+        public int Degree => Coeffs.Count - 1;
 
         public void IncreasePower()
         {
@@ -236,7 +233,7 @@ namespace WpfUI
                     _ => "", // var x when (x < 1)
                 };
 
-                if (degree == this.Degree())
+                if (degree == this.Degree)
                 {
                     s += coeff.ToString() + degreeStr;
                 }
