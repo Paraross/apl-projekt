@@ -1,13 +1,19 @@
 .data
 
-minusOne DD 0bf800000r ; -1
+minusOne DD 0bf800000r ; -1.0
 
-resultCoeffsOffset = 48
+resultCoeffsOffset = 48 ; offset from the stack frame
 
 .code
 
-convertRaw PROC                               ; COMDAT
-$LN60:
+; Parameters are passed according to the x64 calling convention:
+; rcx         : float* roots
+; xmm1        : float scale
+; r8          : long len
+; r9          : float* resultCoeffsPrev
+; Stack (rsp) : float* resultCoeffs
+; Registers saved/restored: rbx, rbp, rsi, rdi, r14
+convertRaw PROC
         mov     rax, rsp
         mov     QWORD PTR [rax+8], rbx
         mov     QWORD PTR [rax+16], rbp
@@ -21,96 +27,99 @@ $LN60:
         movaps  xmm2, xmm1
         mov     r14, rcx
         test    r8, r8
-        jne     SHORT $LN20@convertRaw
+        ; return early if len == 0
+        jne     SHORT ActualFunctionStart
         movss   DWORD PTR [r10], xmm2
-        jmp     $LN18@convertRaw
-$LN20@convertRaw:
+        jmp     Return
+ActualFunctionStart:
         mov     eax, DWORD PTR [rcx]
         lea     rbx, QWORD PTR [r10+4]
+        ; ecx = resultCoeffsLen
         mov     ecx, 2
         mov     DWORD PTR [r10], eax
         mov     DWORD PTR [rbx], 1065353216             ; 3f800000H
         lea     r9d, QWORD PTR [rcx-1]
-        jmp     $LN58@convertRaw
-$LL4@convertRaw:
+        jmp     OuterLoop2
+OuterLoop1:
         movss   xmm1, DWORD PTR [r14+r9*4]
         mov     rsi, rcx
         test    rcx, rcx
-        je      SHORT $LN6@convertRaw
+        je      SHORT AfterInnerLoop1
         mov     r8, r10
         mov     rax, rbp
         sub     r8, rbp
         mov     r11, rcx
-$LL36@convertRaw:
+InnerLoop1: ; multiply each element of resultCoeffsPrev by root
         movaps  xmm0, xmm1
         mulss   xmm0, DWORD PTR [r8+rax]
         movss   DWORD PTR [rax], xmm0
         lea     rax, QWORD PTR [rax+4]
         sub     r11, 1
-        jne     SHORT $LL36@convertRaw
-$LN6@convertRaw:
+        jne     SHORT InnerLoop1
+AfterInnerLoop1:
         add     rbx, 4
+        ; increment resultCoeffsLen
         inc     rcx
         mov     r8, rsi
         mov     DWORD PTR [rbx], edx
         cmp     rsi, 1
-        jb      SHORT $LN9@convertRaw
-$LL10@convertRaw:
+        jb      SHORT AfterInnerLoop2
+InnerLoop2: ; shift resultCoeffs elements by one place to the right
         mov     eax, DWORD PTR [r10+r8*4-4]
         mov     DWORD PTR [r10+r8*4], eax
         dec     r8
         cmp     r8, 1
-        jae     SHORT $LL10@convertRaw
+        jae     SHORT InnerLoop2
         mov     r11, rbp
         mov     DWORD PTR [r10], edx
         sub     r11, r10
         mov     r8, rdx
         mov     rax, r10
-$LL38@convertRaw:
+InnerLoop3: ; add resultCoeffsPrev to resultCoeffs
         movss   xmm0, DWORD PTR [r11+rax]
         inc     r8
         addss   xmm0, DWORD PTR [rax]
         movss   DWORD PTR [rax], xmm0
         add     rax, 4
         cmp     r8, rsi
-        jb      SHORT $LL38@convertRaw
-        jmp     SHORT $LN2@convertRaw
-$LN9@convertRaw:
+        jb      SHORT InnerLoop3
+        jmp     SHORT IncrementLoopCounter
+AfterInnerLoop2:
         mov     DWORD PTR [r10], edx
-$LN2@convertRaw:
+IncrementLoopCounter:
         inc     r9
-$LN58@convertRaw:
+OuterLoop2: ; multiply each resultCoeffs element by scale, and each element on an even index by -1
         cmp     r9, rdi
-        jb      $LL4@convertRaw
+        jb      OuterLoop1
         movss   xmm1, DWORD PTR minusOne
         mov     rax, rdx
         test    rcx, rcx
-        je      SHORT $LN15@convertRaw
-$LL40@convertRaw:
+        je      SHORT AfterOuterLoop2
+OuterLoop2MulScale: ; multiply each resultCoeffs element by scale
         movaps  xmm0, xmm2
         mulss   xmm0, DWORD PTR [r10+rax*4]
         movss   DWORD PTR [r10+rax*4], xmm0
         test    al, 1
-        jne     SHORT $LN41@convertRaw
+        jne     SHORT OuterLoop2End
         mulss   xmm0, xmm1
         movss   DWORD PTR [r10+rax*4], xmm0
-$LN41@convertRaw:
+OuterLoop2End:
         inc     rax
         cmp     rax, rcx
-        jb      SHORT $LL40@convertRaw
-$LN15@convertRaw:
+        jb      SHORT OuterLoop2MulScale
+AfterOuterLoop2: ; return if resultCoeffsLen is even
         test    cl, 1
-        je      SHORT $LN18@convertRaw
+        je      SHORT Return
         test    rcx, rcx
-        je      SHORT $LN18@convertRaw
-$LL43@convertRaw:
+        je      SHORT Return
+OuterLoop3: ; multiply each resultCoeffs element by -1
         movss   xmm0, DWORD PTR [r10+rdx*4]
         mulss   xmm0, xmm1
         movss   DWORD PTR [r10+rdx*4], xmm0
         inc     rdx
         cmp     rdx, rcx
-        jb      SHORT $LL43@convertRaw
-$LN18@convertRaw:
+        jb      SHORT OuterLoop3
+Return:
         mov     rbx, QWORD PTR [rsp+16]
         mov     rbp, QWORD PTR [rsp+24]
         mov     rsi, QWORD PTR [rsp+32]
