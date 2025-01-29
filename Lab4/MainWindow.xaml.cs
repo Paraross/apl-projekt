@@ -278,20 +278,27 @@ namespace WpfUI
             resultCoeffs.Coeffs.Add(poly.Roots[0]);
             resultCoeffs.Coeffs.Add(1.0f);
 
+            var resultCoeffsPrev = new float[poly.Roots.Length];
+
             foreach (var root in poly.Roots[1..])
             {
-                // deep copy?
-                var resultCoeffsPrev = new PolyCoeffs(new List<float>(resultCoeffs.Coeffs));
-                for (var i = 0; i < resultCoeffsPrev.Coeffs.Count; i++)
+                var len = resultCoeffs.Coeffs.Count;
+
+                for (var i = 0; i < len; i++)
                 {
-                    resultCoeffsPrev.Coeffs[i] *= root;
+                    resultCoeffsPrev[i] = resultCoeffs.Coeffs[i];
+                }
+
+                for (var i = 0; i < len; i++)
+                {
+                    resultCoeffsPrev[i] *= root;
                 }
 
                 resultCoeffs.IncreasePower();
 
-                for (var i = 0; i < resultCoeffsPrev.Coeffs.Count; i++)
+                for (var i = 0; i < len; i++)
                 {
-                    resultCoeffs.Coeffs[i] += resultCoeffsPrev.Coeffs[i];
+                    resultCoeffs.Coeffs[i] += resultCoeffsPrev[i];
                 }
             }
 
