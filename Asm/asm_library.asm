@@ -1,12 +1,8 @@
 .data
 
-__real@bf800000 DD 0bf800000r             ; -1
+minusOne DD 0bf800000r ; -1
 
-roots$ = 16
-scale$ = 24
-len$ = 32
-result_coeffs_prev$ = 40
-result_coeffs$ = 48
+resultCoeffsOffset = 48
 
 .code
 
@@ -18,7 +14,7 @@ $LN60:
         mov     QWORD PTR [rax+24], rsi
         mov     QWORD PTR [rax+32], rdi
         push    r14
-        mov     r10, QWORD PTR result_coeffs$[rsp]
+        mov     r10, QWORD PTR resultCoeffsOffset[rsp]
         xor     edx, edx
         mov     rbp, r9
         mov     rdi, r8
@@ -86,7 +82,7 @@ $LN2@convertRaw:
 $LN58@convertRaw:
         cmp     r9, rdi
         jb      $LL4@convertRaw
-        movss   xmm1, DWORD PTR __real@bf800000
+        movss   xmm1, DWORD PTR minusOne
         mov     rax, rdx
         test    rcx, rcx
         je      SHORT $LN15@convertRaw
