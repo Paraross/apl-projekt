@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -109,15 +110,63 @@ namespace WpfUI
         /// </returns>
         private PolyRootsScale GetPolyFromInputAndSetLabel()
         {
-            var rootValues = Roots.Select(root => root.Value);
-            
-            var scale = ScaleUpDown.Value ?? 0.0f;
+            PolyRootsScale rootsPoly;
 
-            var rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
+            var useFile = UseFile.IsChecked ?? false;
+            if (useFile)
+            {
+                rootsPoly = GetPolyFromFile();
+            }
+            else
+            {
+                var rootValues = Roots.Select(root => root.Value);
+
+                var scale = ScaleUpDown.Value ?? 0.0f;
+
+                rootsPoly = new PolyRootsScale(rootValues.ToArray(), scale);
+            }
 
             RootsPolyLabel.Content = rootsPoly.ToString();
 
             return rootsPoly;
+        }
+
+        /// <summary>
+        /// Parses a file and creates a <c>PolyRootsScale</c> from them.
+        /// </summary>
+        /// <returns>
+        /// A <c>PolyRootsScale</c> represented by the values from the file.
+        /// </returns>
+        private static PolyRootsScale GetPolyFromFile()
+        {
+            // TODO: exception handling
+            try
+            {
+                using StreamReader reader = new("../../../values.txt");
+
+                var firstLine = reader.ReadLine();
+                var scale = float.Parse(firstLine ?? "");
+
+                var lines = new List<string>();
+
+                while (true)
+                {
+                    var line = reader.ReadLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
+                    lines.Add(line);
+                };
+                var l = lines.Select(line => float.Parse(line.Trim())).ToArray();
+                var poly = new PolyRootsScale(l, scale);
+
+                return poly;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>
