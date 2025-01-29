@@ -286,12 +286,7 @@ namespace WpfUI
 
                 for (var i = 0; i < len; i++)
                 {
-                    resultCoeffsPrev[i] = resultCoeffs.Coeffs[i];
-                }
-
-                for (var i = 0; i < len; i++)
-                {
-                    resultCoeffsPrev[i] *= root;
+                    resultCoeffsPrev[i] = resultCoeffs.Coeffs[i] * root;
                 }
 
                 resultCoeffs.IncreasePower();
