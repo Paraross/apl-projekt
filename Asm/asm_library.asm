@@ -14,6 +14,7 @@ resultCoeffsOffset = 48 ; offset from the stack frame
 ; Stack (rsp) : float* resultCoeffs
 ; Registers saved/restored: rbx, rbp, rsi, rdi, r14
 convertRaw PROC
+        ; save nonvolatile registers
         mov     rax, rsp
         mov     QWORD PTR [rax+8], rbx
         mov     QWORD PTR [rax+16], rbp
@@ -32,18 +33,20 @@ convertRaw PROC
         movss   DWORD PTR [r10], xmm2
         jmp     Return
 ActualFunctionStart:
+        ; initialize resultCoeffs
         mov     eax, DWORD PTR [rcx]
         lea     rbx, QWORD PTR [r10+4]
         ; ecx = resultCoeffsLen
         mov     ecx, 2
         mov     DWORD PTR [r10], eax
-        mov     DWORD PTR [rbx], 1065353216             ; 3f800000H
+        mov     DWORD PTR [rbx], 03f800000h ; 1.0
         lea     r9d, QWORD PTR [rcx-1]
         jmp     OuterLoop2
-OuterLoop1:
+OuterLoop1: ; process each root from roots
         movss   xmm1, DWORD PTR [r14+r9*4]
         mov     rsi, rcx
         test    rcx, rcx
+        ; skip multiplication by root if resultCoeffsLen == 0
         je      SHORT AfterInnerLoop1
         mov     r8, r10
         mov     rax, rbp
@@ -58,11 +61,11 @@ InnerLoop1: ; multiply each element of resultCoeffsPrev by root
         jne     SHORT InnerLoop1
 AfterInnerLoop1:
         add     rbx, 4
-        ; increment resultCoeffsLen
         inc     rcx
         mov     r8, rsi
         mov     DWORD PTR [rbx], edx
         cmp     rsi, 1
+        ; skip shifting if resultCoeffsLen == 1
         jb      SHORT AfterInnerLoop2
 InnerLoop2: ; shift resultCoeffs elements by one place to the right
         mov     eax, DWORD PTR [r10+r8*4-4]
@@ -85,22 +88,25 @@ InnerLoop3: ; add resultCoeffsPrev to resultCoeffs
         jb      SHORT InnerLoop3
         jmp     SHORT IncrementLoopCounter
 AfterInnerLoop2:
+        ; resultCoeffs[0] = 0.0
         mov     DWORD PTR [r10], edx
 IncrementLoopCounter:
         inc     r9
-OuterLoop2: ; multiply each resultCoeffs element by scale, and each element on an even index by -1
+OuterLoop2: ; multiply each resultCoeffs element by scale, and each element on an even index by -1.0
         cmp     r9, rdi
         jb      OuterLoop1
         movss   xmm1, DWORD PTR minusOne
         mov     rax, rdx
         test    rcx, rcx
         je      SHORT AfterOuterLoop2
-OuterLoop2MulScale: ; multiply each resultCoeffs element by scale
+OuterLoop2MulScale:
         movaps  xmm0, xmm2
+        ; multiply each element by scale
         mulss   xmm0, DWORD PTR [r10+rax*4]
         movss   DWORD PTR [r10+rax*4], xmm0
         test    al, 1
         jne     SHORT OuterLoop2End
+        ; multiply each even element by -1.0
         mulss   xmm0, xmm1
         movss   DWORD PTR [r10+rax*4], xmm0
 OuterLoop2End:
@@ -112,14 +118,14 @@ AfterOuterLoop2: ; return if resultCoeffsLen is even
         je      SHORT Return
         test    rcx, rcx
         je      SHORT Return
-OuterLoop3: ; multiply each resultCoeffs element by -1
+OuterLoop3: ; multiply each resultCoeffs element by -1.0
         movss   xmm0, DWORD PTR [r10+rdx*4]
         mulss   xmm0, xmm1
         movss   DWORD PTR [r10+rdx*4], xmm0
         inc     rdx
         cmp     rdx, rcx
         jb      SHORT OuterLoop3
-Return:
+Return: ; restore nonvolatile registers and return
         mov     rbx, QWORD PTR [rsp+16]
         mov     rbp, QWORD PTR [rsp+24]
         mov     rsi, QWORD PTR [rsp+32]
