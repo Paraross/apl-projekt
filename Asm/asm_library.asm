@@ -13,7 +13,7 @@ resultCoeffsOffset = 48 ; offset from the stack frame
 ; r9          : float* resultCoeffsPrev
 ; Stack (rsp) : float* resultCoeffs
 ; Registers saved/restored: rbx, rbp, rsi, rdi, r14
-convertRaw PROC
+Convert PROC
         ; save nonvolatile registers
         mov     rax, rsp
         mov     QWORD PTR [rax+8], rbx
@@ -132,6 +132,6 @@ Return: ; restore nonvolatile registers and return
         mov     rdi, QWORD PTR [rsp+40]
         pop     r14
         ret     0
-convertRaw ENDP
+Convert ENDP
 
 END

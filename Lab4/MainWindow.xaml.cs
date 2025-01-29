@@ -79,7 +79,7 @@ namespace WpfUI
                     arrPtr = resultCoeffsArr
                 )
                 {
-                    AsmProxy.ExecuteConvertRaw(rootsPtr, rootsPoly.Scale, (long)len, prevArrPtr, arrPtr);
+                    AsmProxy.ExecuteConvert(rootsPtr, rootsPoly.Scale, (long)len, prevArrPtr, arrPtr);
                 }
             }
 
@@ -146,7 +146,7 @@ namespace WpfUI
         /// <param name="resultCoeffsPrev">Additional allocated space used by the procedure.</param>
         /// <param name="resultCoeffs">Where the coefficients of the resulting <c>PolyCoeffs</c> will be written to.</param>
         [DllImport("Asm.dll")]
-        private static extern void convertRaw(
+        private static extern void Convert(
             float* roots,
             float scale,
             long len,
@@ -162,7 +162,7 @@ namespace WpfUI
         /// <param name="len">Number of roots of the <c>PolyRootsScale</c>.</param>
         /// <param name="resultCoeffsPrev">Additional allocated space used by the procedure.</param>
         /// <param name="resultCoeffs">Where the coefficients of the resulting <c>PolyCoeffs</c> will be written to.</param>
-        public static void ExecuteConvertRaw(
+        public static void ExecuteConvert(
             float* roots,
             float scale,
             long len,
@@ -170,7 +170,7 @@ namespace WpfUI
             float* resultCoeffs
         )
         {
-            convertRaw(
+            Convert(
                 roots,
                 scale,
                 len,
