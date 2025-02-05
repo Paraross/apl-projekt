@@ -1,6 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.CodeDom;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -273,48 +275,49 @@ namespace WpfUI
                 return new PolyCoeffs([poly.Scale]);
             }
 
-            var resultCoeffs = new PolyCoeffs([]);
+            var resultPolyCoeffs = new PolyCoeffs(new List<float>(poly.Roots.Length + 1));
 
-            resultCoeffs.Coeffs.Add(poly.Roots[0]);
-            resultCoeffs.Coeffs.Add(1.0f);
+            resultPolyCoeffs.Coeffs.Add(poly.Roots[0]);
+            resultPolyCoeffs.Coeffs.Add(1.0f);
 
-            var resultCoeffsPrev = new float[poly.Roots.Length];
+            var resultPolyCoeffsPrev = new float[poly.Roots.Length];
+            //var resultCoeffsPrev = new PolyCoeffs(new List<float>(poly.Roots.Length));
 
             foreach (var root in poly.Roots[1..])
             {
-                var len = resultCoeffs.Coeffs.Count;
+                var len = resultPolyCoeffs.Coeffs.Count;
 
                 for (var i = 0; i < len; i++)
                 {
-                    resultCoeffsPrev[i] = resultCoeffs.Coeffs[i] * root;
+                    resultPolyCoeffsPrev[i] = resultPolyCoeffs.Coeffs[i] * root;
                 }
 
-                resultCoeffs.IncreasePower();
+                resultPolyCoeffs.IncreasePower();
 
                 for (var i = 0; i < len; i++)
                 {
-                    resultCoeffs.Coeffs[i] += resultCoeffsPrev[i];
+                    resultPolyCoeffs.Coeffs[i] += resultPolyCoeffsPrev[i];
                 }
             }
 
-            for (var i = 0; i < resultCoeffs.Coeffs.Count; i++)
+            for (var i = 0; i < resultPolyCoeffs.Coeffs.Count; i++)
             {
-                resultCoeffs.Coeffs[i] *= poly.Scale;
+                resultPolyCoeffs.Coeffs[i] *= poly.Scale;
                 if (i % 2 == 0)
                 {
-                    resultCoeffs.Coeffs[i] *= -1.0f;
+                    resultPolyCoeffs.Coeffs[i] *= -1.0f;
                 }
             }
 
-            if (resultCoeffs.Degree % 2 == 0)
+            if (resultPolyCoeffs.Degree % 2 == 0)
             {
-                for (var i = 0; i < resultCoeffs.Coeffs.Count; i++)
+                for (var i = 0; i < resultPolyCoeffs.Coeffs.Count; i++)
                 {
-                    resultCoeffs.Coeffs[i] *= -1.0f;
+                    resultPolyCoeffs.Coeffs[i] *= -1.0f;
                 }
             }
 
-            return resultCoeffs;
+            return resultPolyCoeffs;
         }
     }
 
